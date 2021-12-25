@@ -15,14 +15,12 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class Server {
 
     private static final int port = 12345;
-    private static int clientsConnected = 0;
     private final ServerSocket serverSocket;
     private final ExecutorService threadPool;
     private final AtomicBoolean isRunning;
     private final List<Socket> sockets = Collections.synchronizedList(new ArrayList<>());
 
     public Server() throws IOException {
-        System.out.println("-----Starting connection----");
         this.serverSocket = new ServerSocket(port);
         this.threadPool = Executors.newFixedThreadPool(5);
         this.isRunning = new AtomicBoolean(true);
@@ -39,7 +37,6 @@ public class Server {
                 var socket = serverSocket.accept();
                 sockets.add(socket);
                 System.out.println("New client user connection on the port " + socket.getPort());
-                clientsConnected++;
                 threadPool.execute(new ServerMessageManager(socket, this));
             } catch (SocketException e) {
                 System.out.println("SocketException: " + e.getMessage());
@@ -58,5 +55,9 @@ public class Server {
             PrintStream printStream = new PrintStream(socket.getOutputStream());
             printStream.println(message);
         }
+    }
+
+    public long numberOfConnectedClients() {
+        return this.sockets.stream().filter(s -> s.isConnected()).count();
     }
 }
