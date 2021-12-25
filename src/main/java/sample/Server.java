@@ -40,7 +40,6 @@ public class Server {
                 sockets.add(socket);
                 System.out.println("New client user connection on the port " + socket.getPort());
                 clientsConnected++;
-
                 threadPool.execute(new ServerMessageManager(socket, this));
             } catch (SocketException e) {
                 System.out.println("SocketException: " + e.getMessage());
